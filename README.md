@@ -1,2 +1,3 @@
 # battery
-battery reasearch
+clou battery and pack research
+
