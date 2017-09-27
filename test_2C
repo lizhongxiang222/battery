@@ -1,0 +1,108 @@
+'''
+Created on 2017年8月22日
+
+@author: Sherlock
+'''
+import pylab as pl
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import pandas as pd
+import pymysql.cursors
+#import plotly.graph_objs as go
+import plotly
+from mailcap import show
+import numpy as np
+'''
+connection=pymysql.connect(
+    host="10.8.240.20",port=3306,user="store",
+    passwd="store",db="station_inspection",charset="utf8",
+    cursorclass = pymysql.cursors.SSCursor)
+
+'''
+connection=pymysql.connect(
+    host="localhost",port=3306,user="root",
+    db="station_inspection",charset="utf8",
+    cursorclass = pymysql.cursors.SSCursor)
+
+cursor=connection.cursor()
+query = "SELECT * FROM bess_group_data_07 bc \
+WHERE bc.id_cluster = 'DT-DT-0831-21-BC02' \
+AND bc.time_stamp >='2017-07-30 18:00:00' \
+AND bc.time_stamp <='2017-07-30 18:10:00'"
+
+try:
+
+    bc = pd.read_sql(query,connection,index_col='id_group')
+# 关闭游标
+finally: cursor.close()
+#print(bc.columns)
+#print(bc)
+bc01 =  bc.loc['168311320200200',:]
+#print(bc01)
+bc_time01 = bc01.ix[:,'time_stamp']
+#print(bc_time01.shape)
+bc_01 = bc01.set_index(['id_cluster'])
+#print(bc_01)
+bc02 =  bc.loc['168311320200201',:]
+bc_02 = bc02.set_index(['id_cluster'])
+bc03 =  bc.loc['168311320200202',:]
+bc_03 = bc03.set_index(['id_cluster'])
+bc04 =  bc.loc['168311320200203',:]
+bc_04 = bc04.set_index(['id_cluster'])
+bc05 =  bc.loc['168311320200204',:]
+bc_05 = bc02.set_index(['id_cluster'])
+bc06 =  bc.loc['168311320200205',:]
+bc_06 = bc06.set_index(['id_cluster'])
+bc07 =  bc.loc['168311320200206',:]
+bc_07 = bc07.set_index(['id_cluster'])
+bc08 =  bc.loc['168311320200207',:]
+bc_08 = bc08.set_index(['id_cluster'])
+bc09 =  bc.loc['168311320200208',:]
+bc_09 = bc09.set_index(['id_cluster'])
+bc10 =  bc.loc['168311320200209',:]
+bc_10 = bc10.set_index(['id_cluster'])
+bc11 =  bc.loc['1683113202002010',:]
+bc_11 = bc11.set_index(['id_cluster'])
+bc12 =  bc.loc['1683113202002011',:]
+bc_12 = bc12.set_index(['id_cluster'])
+bc13 =  bc.loc['1683113202002012',:]
+bc_13 = bc13.set_index(['id_cluster'])
+bc14 =  bc.loc['1683113202002013',:]
+bc_14 = bc14.set_index(['id_cluster'])
+bc15 =  bc.loc['1683113202002014',:]
+bc_15 = bc15.set_index(['id_cluster'])
+bc16 =  bc.loc['1683113202002015',:]
+bc_16 = bc16.set_index(['id_cluster'])
+bc17=  bc.loc['1683113202002016',:]
+bc_17 = bc17.set_index(['id_cluster'])
+bc18 =  bc.loc['1683113202002017',:]
+bc_18 = bc18.set_index(['id_cluster'])
+#print(bc_01)
+bc_v01 = bc_01.ix[:,'V_cell01':'V_cell12']
+bc_v02 = bc_02.ix[:,'V_cell01':'V_cell12']
+bc_v03 = bc_03.ix[:,'V_cell01':'V_cell12']
+bc_v04 = bc_04.ix[:,'V_cell01':'V_cell12']
+bc_v05 = bc_05.ix[:,'V_cell01':'V_cell12']
+bc_v06 = bc_06.ix[:,'V_cell01':'V_cell12']
+bc_v07 = bc_07.ix[:,'V_cell01':'V_cell12']
+bc_v08 = bc_08.ix[:,'V_cell01':'V_cell12']
+bc_v09 = bc_09.ix[:,'V_cell01':'V_cell12']
+bc_v10 = bc_10.ix[:,'V_cell01':'V_cell12']
+bc_v11 = bc_11.ix[:,'V_cell01':'V_cell12']
+bc_v12 = bc_12.ix[:,'V_cell01':'V_cell12']
+bc_v13 = bc_13.ix[:,'V_cell01':'V_cell12']
+bc_v14 = bc_14.ix[:,'V_cell01':'V_cell12']
+bc_v15 = bc_15.ix[:,'V_cell01':'V_cell12']
+bc_v16 = bc_16.ix[:,'V_cell01':'V_cell12']
+bc_v17 = bc_17.ix[:,'V_cell01':'V_cell12']
+bc_v18 = bc_18.ix[:,'V_cell01':'V_cell12']
+#print(bc_v04.shape)
+x = bc_time01
+y = pd.concat([bc_v01,bc_v02,bc_v03,bc_v04,bc_v05,bc_v06,bc_v07,bc_v08,bc_v09,\
+               bc_v10,bc_v11,bc_v12,bc_v13,bc_v14,bc_v15,bc_v16,bc_v17,bc_v18],axis=1,join='inner')
+print(y.shape)
+mpl_color = plt.figure()
+#cmap = mpl.cm.gray
+plt.plot(x,y)
+plt.title(u"DT-DT-0831-21-BC02",color='k')
+plot_url = plotly.offline.plot_mpl(mpl_color, filename='mpl-color-example.html')
