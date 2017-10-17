@@ -1,6 +1,5 @@
 '''
 Created on 2017年9月6日
-
 @author: rob
 '''
 #设置中文字体
@@ -36,7 +35,7 @@ connection=pymysql.connect(
 '''
 cursor=connection.cursor()
 BATCH_SIZE = 5000
-tmd = 'bc01-2017-10-01'
+tmd = '第2箱-第1堆-第3簇-2017-10-01'
 timegap = "AND bc.time_stamp >='2017-10-01 00:00:00' \
         AND bc.time_stamp <='2017-10-02 00:00:00' "
      
@@ -46,7 +45,7 @@ queryBmu="SELECT id_group,id_station ,I_aver ,time_stamp \
         ,SOC_goup\
     FROM bess_group_data_10 bc \
         WHERE bc.id_station = '2c' \
-        AND (bc.id_cluster ='DT-DT-0831-26-BC01' )"  \
+        AND (bc.id_cluster ='DT-DT-0831-24-BC03' )"  \
         + timegap+ \
         "ORDER BY bc.time_stamp" 
 
@@ -59,8 +58,9 @@ query_DMU="SELECT \
         ,Vdc_cluster \
     FROM bess_parallel_cluster_data_10 bc \
         WHERE bc.id_station = '2c' \
-        AND (bc.id_cluster='DT-DT-0831-26-BC01' )"\
+        AND (bc.id_cluster='DT-DT-0831-24-BC03' )"\
         + timegap
+'''
 query1="SELECT \
         id_group \
         ,I_aver \
@@ -72,6 +72,7 @@ query1="SELECT \
         AND bc.time_stamp >='2017-10-01 00:00:00' \
         AND bc.time_stamp <='2017-10-02 00:00:00' \
          " 
+'''
 count_sql = "SELECT count(*) FROM bess_group_data_10 bc \
         WHERE bc.id_station = '2c' \
         AND bc.time_stamp >='2017-10-01 00:00:00' \
@@ -82,30 +83,33 @@ try:
     cursor.execute(count_sql)
     count=0
     for row1 in cursor:
+        print(row1)
         #do_thing()
         count=row1[0]
         print("count=",count)
-       
+    
     '''组织Pandas数据表格'''
     '''数据库取数据''' 
     dfDMU = pd.read_sql(query_DMU,connection,index_col="time_stamp")    
-    dfDMU.to_csv('data_Dmu'+tmd+'.csv')
+    #print(dfDMU)
+    #dfDMU.to_csv('data_Dmu'+tmd+'.csv')
     print("DMU data save to " + "data_Dmu" + tmd + ".csv")
     df = pd.read_sql(queryBmu,connection,index_col="time_stamp")
-    df.to_csv('data_bmu1-df.csv')
+    #df.to_csv('data_bmu1-df.csv')
+    #print("BMU data save to " + "data_Bmu" + tmd + ".csv")
     #path_b='/Users/rob/Documents/workspace/Battery/src/cell/data_bmu1-df.csv'
     #dateparse = lambda dates: pd.datetime.strptime(dates, '%Y-%m-%d %H:%M:%S')
     #df =pd.read_csv(path_b, sep=',', na_filter=False,index_col='time_stamp',parse_dates=['time_stamp'],date_parser=dateparse,)
 
     #
     #df2 = pd.read_sql(queryBmu02,connection,index_col="time_stamp")
-    
+    #print(df)
     ig = df.drop_duplicates(['id_group'])
-    #print (ig) 排序
+    #print (ig) #排序
     #ig=ig.pop('id_group')
     ig=ig.sort_values(by=['id_group'])    #按列进行排序)
     id_groups = list(ig['id_group']) 
-    print(id_groups)
+    #print(id_groups)
     groupNum = len(id_groups)
     print('groupNum=',groupNum)
     
@@ -140,6 +144,7 @@ try:
         for k in range(1, 13):
             newhead = 'V_cell'+'%d' %((k)+(iGroup-1)*12)
             oldhead = ('V_cell0'+'%d'%k) if k<10 else('V_cell'+'%d' %k)
+            #print(newhead)
             out1 = df2.pop(oldhead)
             #print(out1)
             df0.loc[:,(newhead)] = out1
@@ -332,13 +337,13 @@ try:
     # Title
     annotations.append(dict(xref='paper', yref='paper', x=0.0, y=1.05,
                               xanchor='left', yanchor='bottom',
-                              text='多轴电芯分析图',
+                              text=tmd+'/电芯分析图',
                               font=dict(family='Arial',
                                         size=30,
                                         color='rgb(37,37,37)'),
                               showarrow=False))
     # Source
-    annotations.append(dict(xref='paper', yref='paper', x=0.5, y=-0.1,
+    annotations.append(dict(xref='paper', yref='paper', x=0.5, y=-0.05,
                               xanchor='center', yanchor='top',
                               text='数据来源: 同达电厂储能AGC & ' +
                                    '调频数据',
@@ -348,11 +353,11 @@ try:
                               showarrow=False))
     layout['annotations'] = annotations
     fig = go.Figure(data=traces, layout=layout)
-    plot_url = plotly.offline.plot(fig,filename='four'+tmd+'.html')
+    plot_url = plotly.offline.plot(fig,filename=tmd+'.html')
 except pymysql.Error as err:
     print("query table 'mytable' failed.")
     print("Error: {}".format(err.msg))
     sys.exit()
-    
+
 #cursor.close()
 #connection.close()
